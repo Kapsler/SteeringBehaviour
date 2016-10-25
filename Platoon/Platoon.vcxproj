@@ -146,6 +146,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Renderable.cpp" />
+    <ClCompile Include="RenderObject.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Collidable.h" />
+    <ClInclude Include="Renderable.h" />
+    <ClInclude Include="RenderObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
