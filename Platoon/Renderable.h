@@ -8,7 +8,5 @@ public:
 	virtual ~Renderable();
 
 	virtual void Render(sf::RenderWindow* window) = 0;
-
-	sf::Texture texture; 
-	sf::Sprite sprite;
+	virtual void DebugDraw(sf::RenderWindow* window) = 0;
 };

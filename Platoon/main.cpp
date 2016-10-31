@@ -1,16 +1,47 @@
 #include <SFML/Graphics.hpp>
 #include "RenderObject.h"
+#include "Actor.h"
+#include <glm/glm.hpp>
 
-std::vector<RenderObject*> renderObjects;
+std::vector<Renderable*> renderObjects;
+std::vector<Moving*> movingObjects;
+
+int screenWidth = 1000;
+int screenHeight = 1000;
+
+void freeStuff()
+{
+	for(auto i : renderObjects)
+	{
+		delete i;
+	}
+}
+
+void DebugRender(Renderable* obj, sf::RenderWindow* window)
+{
+	obj->DebugDraw(window);
+}
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");	
+	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "SFML works!");
 	window.setKeyRepeatEnabled(false);
 
 	//Hardcoded
-	renderObjects.push_back(new RenderObject("./Assets/floor.jpg"));
+	//floor
+	renderObjects.push_back(new RenderObject("./Assets/floor.jpg", glm::vec2(screenWidth / 2, screenHeight / 2)));
+
+	//Soldier
+	Actor* tmp = new Actor("./Assets/soldier.png");
+	tmp->setPosition(glm::vec2(screenWidth / 4, screenHeight / 4));
+	renderObjects.push_back(tmp);
+	movingObjects.push_back(tmp);
+
+
 	//Hardcoded End
+
+	//Timer
+	sf::Clock deltaClock;
 
 	while (window.isOpen())
 	{
@@ -32,14 +63,24 @@ int main()
 		window.clear();
 
 
+		//Move stuff
+		for(auto obj : movingObjects)
+		{
+			obj->Move(deltaClock.restart());
+		}
+
 		//Render stuff
 		for(auto obj : renderObjects)
 		{
+			DebugRender(obj, &window);
 			obj->Render(&window);
 		}
 
+
 		window.display();
 	}
+
+	freeStuff();
 
 	return 0;
 }
