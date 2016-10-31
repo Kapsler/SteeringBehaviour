@@ -5,6 +5,7 @@
 
 std::vector<Renderable*> renderObjects;
 std::vector<Moving*> movingObjects;
+std::vector<Actor*> actorObjects;
 
 int screenWidth = 1000;
 int screenHeight = 1000;
@@ -37,6 +38,7 @@ int main()
 	tmp->setPosition(glm::vec2(screenWidth / 4, screenHeight / 4));
 	renderObjects.push_back(tmp);
 	movingObjects.push_back(tmp);
+	actorObjects.push_back(tmp);
 
 
 	//Hardcoded End
@@ -57,6 +59,12 @@ int main()
 				if (event.key.code == sf::Keyboard::Key::Escape)
 				{
 					window.close();
+				}
+			} else if(event.key.code == sf::Keyboard::Space)
+			{
+				for(auto i : actorObjects)
+				{
+					i->ToggleTargetType();
 				}
 			}
 		}

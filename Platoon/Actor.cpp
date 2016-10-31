@@ -26,6 +26,8 @@ Actor::Actor(string fileName)
 	//Hardcoded Target
 	target.x = 800.0f;
 	target.y = 800.0f;
+	targettype = 0;
+	ToggleTargetType();
 	//Target end
 }
 
@@ -94,8 +96,8 @@ void Actor::DebugDraw(sf::RenderWindow* window)
 	//End following
 
 	sf::CircleShape targetshape;
-	targetshape.setPosition(target.x, target.y);
-	targetshape.setRadius(10);
+	targetshape.setRadius(2);
+	targetshape.setPosition(target.x - targetshape.getRadius(), target.y - targetshape.getRadius());
 
 	window->draw(targetshape);
 }
@@ -108,13 +110,23 @@ void Actor::Move(sf::Time deltaTime)
 		MarkPosition();
 		timeSincePoint = 0.0f;
 	}
-	
 
 	glm::vec2 steering;
 	
-	//steering = Seek(velocity, target);
-	steering = Arrive(velocity, target);
-	//steering = Flee(velocity, target);
+	switch(targettype)
+	{
+	case 1:
+		steering = Seek(velocity, target);
+		break;
+	case 2:
+		steering = Arrive(velocity, target);
+		break;
+	case 3:
+		steering = Flee(velocity, target);
+		break;
+	default:
+		break;
+	}
 
 	velocity = (velocity + steering);
 	velocity = truncate(velocity, maxSpeed) ;
@@ -189,4 +201,25 @@ void Actor::MarkPosition()
 	newpoint.setFillColor(sf::Color(180, 40, 40, 120));
 
 	trajectory.push_back(sf::CircleShape(newpoint));
+}
+
+void Actor::ToggleTargetType()
+{
+	targettype++;
+	if (targettype > 3) targettype = 1;
+
+	switch (targettype)
+	{
+	case 1:
+		cout << "Where is that bastard..." << endl;
+		break;
+	case 2:
+		cout << "There he is!" << endl;
+		break;
+	case 3:
+		cout << "OMG! RUN FOR YOUR LIFES!!" << endl;
+		break;
+	default:
+		break;
+	}
 }

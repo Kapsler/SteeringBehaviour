@@ -27,6 +27,7 @@ public:
 
 	glm::vec2 truncate(glm::vec2 totrunc, float);
 	void MarkPosition();
+	void ToggleTargetType();
 
 private:
 	glm::vec2 position;
@@ -41,4 +42,5 @@ private:
 
 	float timeSincePoint;
 	vector<sf::CircleShape> trajectory;
+	int targettype;
 };
