@@ -16,8 +16,9 @@ Actor::Actor(string fileName)
 	//Moving related
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
-	maxSpeed = 300.0f;
-	turnRadius = 0.0005f;
+	maxSpeed = 8.0f;
+	steeringForce = 0.5f;
+	arrivalRadius = 100.0f;
 
 	//Hardcoded Target
 	target.x = 800.0f;
@@ -40,6 +41,12 @@ Actor::~Actor()
 
 void Actor::setPosition(glm::vec2 pos)
 {
+	//Bind in screen
+	if (pos.x < 0) pos.x = 0;
+	if (pos.y < 0) pos.y = 0;
+	if (pos.x > 1000) pos.x = 1000;
+	if (pos.y > 1000) pos.y = 1000;
+
 	position = pos;
 	renderObject->setPosition(pos);
 	boundingCircle->setPosition(sf::Vector2f(position.x - renderObject->sprite.getGlobalBounds().width / 2, position.y - renderObject->sprite.getGlobalBounds().height / 2));
@@ -88,22 +95,69 @@ void Actor::DebugDraw(sf::RenderWindow* window)
 
 void Actor::Move(sf::Time deltaTime)
 {
-	glm::vec2 steering = Seek(velocity, target);
+	glm::vec2 steering;
+	
+	//steering = Seek(velocity, target);
+	steering = Arrive(velocity, target);
+	//steering = Flee(velocity, target);
 
-	velocity = glm::normalize(velocity + steering) * maxSpeed * deltaTime.asSeconds();
-	if (velocity.x != 0 && velocity.y != 0)
+	//velocity = glm::normalize(velocity + steering) * maxSpeed * deltaTime.asSeconds();
+	velocity = (velocity + steering);
+	velocity = truncate(velocity, maxSpeed) ;
+	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
 	{
 		setPosition(position + velocity);
 	}
 }
 
-
 glm::vec2 Actor::Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 {
-	glm::vec2 desiredVelocity = currentTarget - position;
+	glm::vec2 desiredVelocity = glm::normalize(currentTarget - position) * maxSpeed;
 	glm::vec2 newSteering = desiredVelocity - currentVelocity;
 
-	newSteering = glm::normalize(newSteering) * turnRadius;
+	newSteering = truncate(newSteering, steeringForce);
 
 	return newSteering;
+}
+
+glm::vec2 Actor::Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
+{
+	glm::vec2 desiredVelocity = glm::normalize(position - currentTarget) * maxSpeed;
+	glm::vec2 newSteering = desiredVelocity - currentVelocity;
+
+	newSteering = truncate(newSteering, steeringForce);
+
+	return newSteering;
+}
+
+glm::vec2 Actor::Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
+{
+	glm::vec2 desiredVelocity = currentTarget - position;
+	float distance = glm::distance(currentTarget, position);
+
+	if(distance < arrivalRadius)
+	{
+		desiredVelocity = glm::normalize(desiredVelocity) * maxSpeed * (distance / arrivalRadius);
+	} else
+	{
+		desiredVelocity = glm::normalize(desiredVelocity) * maxSpeed;
+	}
+
+	glm::vec2 newSteering;
+	newSteering = desiredVelocity - currentVelocity;
+	
+	newSteering = truncate(newSteering, steeringForce);
+
+	return newSteering;
+}
+
+glm::vec2 Actor::truncate(glm::vec2 totrunc, float max)
+{
+	float i = max / glm::length(totrunc);
+	if(i > 1.0f)
+	{
+		i = 1.0f;
+	}
+
+	return totrunc * i;
 }

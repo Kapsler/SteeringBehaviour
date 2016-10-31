@@ -26,6 +26,7 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "SFML works!");
 	window.setKeyRepeatEnabled(false);
+	window.setVerticalSyncEnabled(true);
 
 	//Hardcoded
 	//floor

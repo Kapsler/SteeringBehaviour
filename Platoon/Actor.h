@@ -22,6 +22,10 @@ public:
 
 	void Move(sf::Time delta) override;
 	glm::vec2 Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
+	glm::vec2 Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
+	glm::vec2 Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
+
+	glm::vec2 truncate(glm::vec2 totrunc, float);
 
 private:
 	glm::vec2 position;
@@ -31,5 +35,6 @@ private:
 
 	glm::vec2 target;
 	float maxSpeed;
-	float turnRadius;
+	float steeringForce;
+	float arrivalRadius;
 };
