@@ -20,6 +20,9 @@ Actor::Actor(string fileName)
 	steeringForce = 0.5f;
 	arrivalRadius = 100.0f;
 
+	//trajectory
+	timeSincePoint = 0.0f;
+
 	//Hardcoded Target
 	target.x = 800.0f;
 	target.y = 800.0f;
@@ -70,6 +73,10 @@ bool Actor::Intersect(sf::FloatRect* rect)
 void Actor::Render(sf::RenderWindow* window)
 {
 	renderObject->Render(window);
+	for(auto i : trajectory)
+	{
+		window->draw(i);
+	}
 }
 
 void Actor::DebugDraw(sf::RenderWindow* window)
@@ -95,13 +102,21 @@ void Actor::DebugDraw(sf::RenderWindow* window)
 
 void Actor::Move(sf::Time deltaTime)
 {
+	timeSincePoint += deltaTime.asSeconds();
+	cout << timeSincePoint << endl;
+	if(timeSincePoint > 0.25f)
+	{
+		MarkPosition();
+		timeSincePoint = 0.0f;
+	}
+	
+
 	glm::vec2 steering;
 	
 	//steering = Seek(velocity, target);
 	steering = Arrive(velocity, target);
 	//steering = Flee(velocity, target);
 
-	//velocity = glm::normalize(velocity + steering) * maxSpeed * deltaTime.asSeconds();
 	velocity = (velocity + steering);
 	velocity = truncate(velocity, maxSpeed) ;
 	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
@@ -160,4 +175,19 @@ glm::vec2 Actor::truncate(glm::vec2 totrunc, float max)
 	}
 
 	return totrunc * i;
+}
+
+void Actor::MarkPosition()
+{
+	if(trajectory.size() > 25)
+	{
+		trajectory.erase(trajectory.begin());
+	}
+	
+	sf::CircleShape newpoint;
+	newpoint.setPosition(position.x, position.y);
+	newpoint.setRadius(10.0f);
+	newpoint.setFillColor(sf::Color(180, 40, 40, 120));
+
+	trajectory.push_back(sf::CircleShape(newpoint));
 }

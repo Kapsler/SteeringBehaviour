@@ -26,6 +26,7 @@ public:
 	glm::vec2 Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
 
 	glm::vec2 truncate(glm::vec2 totrunc, float);
+	void MarkPosition();
 
 private:
 	glm::vec2 position;
@@ -37,4 +38,7 @@ private:
 	float maxSpeed;
 	float steeringForce;
 	float arrivalRadius;
+
+	float timeSincePoint;
+	vector<sf::CircleShape> trajectory;
 };
