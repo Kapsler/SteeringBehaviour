@@ -5,7 +5,7 @@ Actor::Actor(string fileName)
 	//General Attributes
 	renderObject = new RenderObject(fileName);
 	renderObject->sprite.setOrigin(renderObject->sprite.getLocalBounds().width / 2.5f, renderObject->sprite.getLocalBounds().height / 3);
-	renderObject->sprite.scale(0.5f, 0.5f);
+	renderObject->sprite.scale(0.2f, 0.2f);
 
 	//BoundingCirlce
 	float biggerside = renderObject->sprite.getGlobalBounds().width;
@@ -16,9 +16,9 @@ Actor::Actor(string fileName)
 	//Moving related
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
-	maxSpeed = 8.0f;
-	steeringForce = 0.5f;
-	arrivalRadius = 100.0f;
+	maxSpeed = 3.0f;
+	steeringForce = 0.2f;
+	arrivalRadius = 50.0f;;
 
 	//trajectory
 	timeSincePoint = 0.0f;
@@ -103,7 +103,6 @@ void Actor::DebugDraw(sf::RenderWindow* window)
 void Actor::Move(sf::Time deltaTime)
 {
 	timeSincePoint += deltaTime.asSeconds();
-	cout << timeSincePoint << endl;
 	if(timeSincePoint > 0.25f)
 	{
 		MarkPosition();
@@ -186,7 +185,7 @@ void Actor::MarkPosition()
 	
 	sf::CircleShape newpoint;
 	newpoint.setPosition(position.x, position.y);
-	newpoint.setRadius(10.0f);
+	newpoint.setRadius(5.0f);
 	newpoint.setFillColor(sf::Color(180, 40, 40, 120));
 
 	trajectory.push_back(sf::CircleShape(newpoint));
