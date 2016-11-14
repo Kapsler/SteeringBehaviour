@@ -15,8 +15,6 @@ Actor::Actor(string fileName, int i)
 	//Moving related
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
-	/*maxSpeed = 3.0f;
-	steeringForce = 0.1f;*/
 	maxSpeed = 180.0f;
 	steeringForce = 6.0f;
 	arrivalRadius = 50.0f;
@@ -28,7 +26,7 @@ Actor::Actor(string fileName, int i)
 	//Hardcoded Target
 	target.x = 800.0f;
 	target.y = 800.0f;
-	targettype = 0;
+	targettype = 1;
 	ToggleTargetType();
 	//Target end
 }
@@ -57,10 +55,6 @@ void Actor::setPosition(glm::vec2 pos)
 	position = pos;
 	renderObject->setPosition(pos);
 	boundingCircle->setPosition(sf::Vector2f(position.x - renderObject->sprite.getGlobalBounds().width / 2, position.y - renderObject->sprite.getGlobalBounds().height / 2));
-	if(isLeader)
-	{
-		formation->setLeaderPos(pos);
-	}
 }
 
 void Actor::setFormation(Formation* form)
@@ -82,10 +76,6 @@ void Actor::setRotation(float rot)
 {
 	renderObject->setRotation(rot);
 	//boundingCircle->setRotation(rot);
-	if (isLeader)
-	{
-		formation->setLeaderRot(rot);
-	}
 }
 
 float Actor::GetRotation()
@@ -123,7 +113,6 @@ void Actor::DebugDraw(sf::RenderWindow* window)
 	sf::Vector2f mouse = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
 	target.x = mouse.x;
 	target.y = mouse.y;
-
 	//End following
 
 	sf::CircleShape targetshape;
@@ -144,6 +133,8 @@ void Actor::Move(sf::Time deltaTime)
 
 	glm::vec2 steering;
 	
+	target = formation->GetOffsetForIndex(index);
+
 	switch(targettype)
 	{
 	case 1:

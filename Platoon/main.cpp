@@ -61,6 +61,8 @@ int main()
 
 	while (window.isOpen())
 	{
+		sf::Time deltaTime = deltaClock.restart();
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -86,9 +88,9 @@ int main()
 
 
 		//Move stuff
-		for(auto obj : movingObjects)
+		for(const auto& obj : movingObjects)
 		{
-			obj->Move(deltaClock.restart());
+			obj->Move(deltaTime);
 		}
 
 		//Render stuff

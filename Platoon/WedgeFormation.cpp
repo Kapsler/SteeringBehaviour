@@ -9,19 +9,19 @@ WedgeFormation::WedgeFormation()
 	offsets.push_back(leadertmp);
 
 	sf::CircleShape* tmp = new sf::CircleShape;
-	tmp->setPosition(-30.0f, 30.0f);
+	tmp->setPosition(-50.0f, 50.0f);
 	tmp->setRadius(10.0f);
 	tmp->setOrigin(leadertmp->getPosition().x + leadertmp->getGlobalBounds().width / 2, leadertmp->getPosition().y + leadertmp->getGlobalBounds().height / 2);
 	offsets.push_back(tmp);
 
 	tmp = new sf::CircleShape;
-	tmp->setPosition(30.0f, 30.0f);
+	tmp->setPosition(50.0f, 50.0f);
 	tmp->setRadius(10.0f);
 	tmp->setOrigin(leadertmp->getPosition().x + leadertmp->getLocalBounds().width / 2, leadertmp->getPosition().y + leadertmp->getLocalBounds().height / 2);
 	offsets.push_back(tmp);
 
 	tmp = new sf::CircleShape;
-	tmp->setPosition(60.0f, 60.0f);
+	tmp->setPosition(100.0f, 100.0f);
 	tmp->setRadius(10.0f);
 	tmp->setOrigin(leadertmp->getPosition().x + leadertmp->getLocalBounds().width / 2, leadertmp->getPosition().y + leadertmp->getLocalBounds().height / 2);
 	offsets.push_back(tmp);

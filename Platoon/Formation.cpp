@@ -9,8 +9,8 @@ Formation::Formation()
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
 
-	maxSpeed = 180.0f;
-	steeringForce = 6.0f;
+	maxSpeed = 120.0f;
+	steeringForce = 4.0f;
 }
 
 Formation::~Formation()
