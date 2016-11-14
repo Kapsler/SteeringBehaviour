@@ -27,24 +27,10 @@ int Formation::registerSoldier()
 	return currIndex - 1;
 }
 
-void Formation::setLeaderPos(glm::vec2 pos)
-{
-	//leaderPos = pos;
-}
-
-void Formation::setLeaderRot(float rot)
-{
-	leaderRot = rot; 
-	for (auto* obj : offsets)
-	{
-		obj->setRotation(leaderRot);
-	}
-}
-
 glm::vec2 Formation::GetOffsetForIndex(int index)
 {
 	glm::vec2 offset(offsets.at(index)->getPosition().x, offsets.at(index)->getPosition().y);
-	offset += leaderPos;
+	offset += position;
 
 	return offset;
 }
@@ -52,7 +38,6 @@ glm::vec2 Formation::GetOffsetForIndex(int index)
 void Formation::SetPosition(glm::vec2 pos)
 {
 	position = pos;
-	leaderPos = pos;
 }
 
 void Formation::SetPath(Path* newpath)
@@ -67,12 +52,14 @@ void Formation::Render(sf::RenderWindow* window)
 
 void Formation::DebugDraw(sf::RenderWindow* window)
 {
-	for (auto* obj : offsets)
+	for(int i = 0; i < offsets.size(); ++i)
 	{
-		sf::CircleShape tmp(*obj);
-		tmp.setFillColor(sf::Color(40,40,120,120));
-		tmp.move(position.x, position.y);
-		tmp.setRotation(leaderRot);
+
+		sf::CircleShape tmp(*offsets[i]);
+		tmp.setFillColor(sf::Color(40, 40, 120, 120));
+		tmp.setOrigin(tmp.getRadius(), tmp.getRadius());
+		tmp.move(GetOffsetForIndex(i).x, GetOffsetForIndex(i).y);
+		tmp.setRotation(orientation);
 		window->draw(tmp);
 	}
 }
@@ -95,6 +82,16 @@ void Formation::Move(sf::Time delta)
 	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
 	{
 		SetPosition(position + velocity * delta.asSeconds());
+		SetRotation(atan2(normalize(velocity).y, normalize(velocity).x) * 180.0f / 3.1415926f);
+	}
+}
+
+void Formation::SetRotation(float rot)
+{
+	orientation = rot;
+	for (auto* obj : offsets)
+	{
+		obj->setRotation(orientation);
 	}
 }
 

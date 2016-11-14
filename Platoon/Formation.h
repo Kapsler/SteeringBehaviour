@@ -13,16 +13,15 @@ public:
 	~Formation();
 	
 	int registerSoldier();
-	void setLeaderPos(glm::vec2 pos);
-	void setLeaderRot(float rot);
 	glm::vec2 GetOffsetForIndex(int index);
-	void SetPosition(glm::vec2 pos);
 	void SetPath(Path* newpath);
 	
 	void Render(sf::RenderWindow* window) override;
 	void DebugDraw(sf::RenderWindow* window) override;
 
 	void Move(sf::Time delta) override;
+	void SetRotation(float rot);
+	void SetPosition(glm::vec2 pos);
 
 	glm::vec2 Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
 	glm::vec2 truncate(glm::vec2 totrunc, float) const;
@@ -38,7 +37,7 @@ protected:
 	glm::vec2 target;
 
 	glm::vec2 leaderPos;
-	float leaderRot;
+	float orientation;
 
 	Path* pathtofollow;
 	int currentWaypoint = 0;

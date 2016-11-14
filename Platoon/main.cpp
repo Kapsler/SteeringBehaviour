@@ -42,13 +42,14 @@ int main()
 
 	//Formation
 	Formation* wedgeFormation = new WedgeFormation();
+	wedgeFormation->SetPosition(glm::vec2(499.0f, 499.0f));
 	wedgeFormation->SetPath(path);
 	renderObjects.push_back(wedgeFormation);
 	movingObjects.push_back(wedgeFormation);
 
 	//Soldier
 	Actor* tmp = new Actor("./Assets/soldier.png", 0);
-	tmp->setPosition(glm::vec2(screenWidth / 4, screenHeight / 4));
+	tmp->setPosition(glm::vec2(498.0f, 498.0f));
 	tmp->setFormation(wedgeFormation);
 	renderObjects.push_back(tmp);
 	movingObjects.push_back(tmp);
