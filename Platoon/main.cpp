@@ -9,13 +9,14 @@ std::vector<Renderable*> renderObjects;
 std::vector<Moving*> movingObjects;
 std::vector<Actor*> actorObjects;
 std::vector<Formation*> formations;
+std::vector<void*> stufftobefreed;
 
 int screenWidth = 1000;
 int screenHeight = 1000;
 
 void freeStuff()
 {
-	for(auto i : renderObjects)
+	for(auto i : stufftobefreed)
 	{
 		delete i;
 	}
@@ -34,11 +35,14 @@ int main()
 
 	//Hardcoded
 	//floor
-	renderObjects.push_back(new RenderObject("./Assets/floor.jpg", glm::vec2(screenWidth / 2, screenHeight / 2)));
-
+	RenderObject* floor = new RenderObject("./Assets/floor.jpg", glm::vec2(screenWidth / 2, screenHeight / 2));
+	renderObjects.push_back(floor); 
+	stufftobefreed.push_back(floor);
+	
 	//Path
 	Path* path = new Path();
 	renderObjects.push_back(path);
+	stufftobefreed.push_back(path);
 
 	//Formation
 	Formation* wedgeFormation = new WedgeFormation();
@@ -46,6 +50,7 @@ int main()
 	wedgeFormation->SetPath(path);
 	renderObjects.push_back(wedgeFormation);
 	movingObjects.push_back(wedgeFormation);
+	stufftobefreed.push_back(wedgeFormation);
 
 	//Soldier
 	Actor* tmp = new Actor("./Assets/soldier.png", 0);
@@ -54,6 +59,7 @@ int main()
 	renderObjects.push_back(tmp);
 	movingObjects.push_back(tmp);
 	actorObjects.push_back(tmp);
+	stufftobefreed.push_back(tmp);
 
 	//Hardcoded End
 
@@ -76,11 +82,12 @@ int main()
 				{
 					window.close();
 				}
-			} else if(event.key.code == sf::Keyboard::Space)
-			{
-				for(auto i : actorObjects)
+				else if (event.key.code == sf::Keyboard::Space)
 				{
-					i->ToggleTargetType();
+					for (auto i : actorObjects)
+					{
+						i->ToggleTargetType();
+					}
 				}
 			}
 		}
@@ -100,7 +107,6 @@ int main()
 			DebugRender(obj, &window);
 			obj->Render(&window);
 		}
-
 
 		window.display();
 	}
