@@ -36,6 +36,15 @@
     <ClCompile Include="Moving.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Formation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WedgeFormation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderable.h">
@@ -51,6 +60,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Moving.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Formation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WedgeFormation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

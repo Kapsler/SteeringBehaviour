@@ -9,5 +9,4 @@ public:
 	virtual ~Moving();
 
 	virtual void Move(sf::Time delta) = 0;
-
 };

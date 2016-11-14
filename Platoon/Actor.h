@@ -3,16 +3,20 @@
 #include "Collidable.h"
 #include "Moving.h"
 #include <glm/glm.hpp>
+#include "Formation.h"
 
 class Actor : public Renderable, public Collidable, public Moving
 {
 public:
-	Actor(string fileName);
+	Actor(string fileName, int i);
 	Actor(const Actor&);
 	~Actor();
 
 	void setPosition(glm::vec2 pos);
+	void setFormation(Formation* form);
 	glm::vec2 getPosition();
+	void setRotation(float rot);
+	float GetRotation();
 
 	bool Intersect(sf::CircleShape* circle) override;
 	bool Intersect(sf::FloatRect* rect) override;
@@ -39,8 +43,13 @@ private:
 	float maxSpeed;
 	float steeringForce;
 	float arrivalRadius;
+	Formation* formation;
+	std::vector<glm::vec2> path;
 
 	float timeSincePoint;
 	vector<sf::CircleShape> trajectory;
 	int targettype;
+	int index;
+	bool isLeader;
+
 };

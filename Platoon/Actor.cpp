@@ -1,6 +1,6 @@
 #include "Actor.h"
 
-Actor::Actor(string fileName)
+Actor::Actor(string fileName, int i)
 {
 	//General Attributes
 	renderObject = new RenderObject(fileName);
@@ -12,13 +12,15 @@ Actor::Actor(string fileName)
 	if (renderObject->sprite.getGlobalBounds().height > biggerside) biggerside = renderObject->sprite.getGlobalBounds().height;
 	boundingCircle = new sf::CircleShape(biggerside / 2);
 	boundingCircle->setPosition(sf::Vector2f(renderObject->sprite.getPosition().x - renderObject->sprite.getGlobalBounds().width / 2, renderObject->sprite.getPosition().y - renderObject->sprite.getGlobalBounds().height / 2));
-
 	//Moving related
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
-	maxSpeed = 3.0f;
-	steeringForce = 0.2f;
-	arrivalRadius = 50.0f;;
+	/*maxSpeed = 3.0f;
+	steeringForce = 0.1f;*/
+	maxSpeed = 180.0f;
+	steeringForce = 6.0f;
+	arrivalRadius = 50.0f;
+	isLeader = false;
 
 	//trajectory
 	timeSincePoint = 0.0f;
@@ -55,11 +57,40 @@ void Actor::setPosition(glm::vec2 pos)
 	position = pos;
 	renderObject->setPosition(pos);
 	boundingCircle->setPosition(sf::Vector2f(position.x - renderObject->sprite.getGlobalBounds().width / 2, position.y - renderObject->sprite.getGlobalBounds().height / 2));
+	if(isLeader)
+	{
+		formation->setLeaderPos(pos);
+	}
+}
+
+void Actor::setFormation(Formation* form)
+{
+	formation = form;
+	index = form->registerSoldier();	
+	if(index == 0)
+	{
+		isLeader = true;
+	}
 }
 
 glm::vec2 Actor::getPosition()
 {
 	return position;
+}
+
+void Actor::setRotation(float rot)
+{
+	renderObject->setRotation(rot);
+	//boundingCircle->setRotation(rot);
+	if (isLeader)
+	{
+		formation->setLeaderRot(rot);
+	}
+}
+
+float Actor::GetRotation()
+{
+	return renderObject->sprite.getRotation();
 }
 
 bool Actor::Intersect(sf::CircleShape* circle)
@@ -128,11 +159,12 @@ void Actor::Move(sf::Time deltaTime)
 		break;
 	}
 
-	velocity = (velocity + steering);
+	velocity = velocity + steering * deltaTime.asSeconds() * 100.0f;
 	velocity = truncate(velocity, maxSpeed) ;
 	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
 	{
-		setPosition(position + velocity);
+		setPosition(position + velocity * deltaTime.asSeconds());
+		setRotation(atan2(normalize(velocity).y, normalize(velocity).x) * 180.0f / 3.1415926f);
 	}
 }
 
@@ -190,7 +222,7 @@ glm::vec2 Actor::truncate(glm::vec2 totrunc, float max)
 
 void Actor::MarkPosition()
 {
-	if(trajectory.size() > 25)
+	if(trajectory.size() > 50)
 	{
 		trajectory.erase(trajectory.begin());
 	}

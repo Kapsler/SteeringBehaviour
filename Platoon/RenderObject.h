@@ -13,6 +13,7 @@ public:
 	~RenderObject();
 
 	void setPosition(glm::vec2 pos);
+	void setRotation(float rot);
 
 
 	void Render(sf::RenderWindow* window) override;

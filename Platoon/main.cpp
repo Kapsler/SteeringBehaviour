@@ -2,10 +2,13 @@
 #include "RenderObject.h"
 #include "Actor.h"
 #include <glm/glm.hpp>
+#include "WedgeFormation.h"
+#include "Path.h"
 
 std::vector<Renderable*> renderObjects;
 std::vector<Moving*> movingObjects;
 std::vector<Actor*> actorObjects;
+std::vector<Formation*> formations;
 
 int screenWidth = 1000;
 int screenHeight = 1000;
@@ -33,13 +36,23 @@ int main()
 	//floor
 	renderObjects.push_back(new RenderObject("./Assets/floor.jpg", glm::vec2(screenWidth / 2, screenHeight / 2)));
 
+	//Path
+	Path* path = new Path();
+	renderObjects.push_back(path);
+
+	//Formation
+	Formation* wedgeFormation = new WedgeFormation();
+	wedgeFormation->SetPath(path);
+	renderObjects.push_back(wedgeFormation);
+	movingObjects.push_back(wedgeFormation);
+
 	//Soldier
-	Actor* tmp = new Actor("./Assets/soldier.png");
+	Actor* tmp = new Actor("./Assets/soldier.png", 0);
 	tmp->setPosition(glm::vec2(screenWidth / 4, screenHeight / 4));
+	tmp->setFormation(wedgeFormation);
 	renderObjects.push_back(tmp);
 	movingObjects.push_back(tmp);
 	actorObjects.push_back(tmp);
-
 
 	//Hardcoded End
 

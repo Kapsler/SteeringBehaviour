@@ -5,7 +5,7 @@ RenderObject::RenderObject(string fileName)
 	if (!texture.loadFromFile(fileName))
 	{
 		cerr << "Coudln't load texture " << fileName << std::endl;
-		//texture.loadFromFile("");
+		texture.loadFromFile("./Assets/missing.jpg");
 	}
 	texture.setSmooth(true);
 	texture.setRepeated(false);
@@ -31,6 +31,10 @@ void RenderObject::setPosition(glm::vec2 pos)
 	sprite.setPosition(pos.x, pos.y);
 }
 
+void RenderObject::setRotation(float rot)
+{
+	sprite.setRotation(rot);
+}
 
 void RenderObject::Render(sf::RenderWindow* window)
 {
@@ -39,13 +43,4 @@ void RenderObject::Render(sf::RenderWindow* window)
 
 void RenderObject::DebugDraw(sf::RenderWindow* window)
 {
-	/*float biggerside = sprite.getGlobalBounds().width;
-	if (sprite.getGlobalBounds().height > biggerside) biggerside = sprite.getGlobalBounds().height;
-	sf::RectangleShape box(sf::Vector2<float>(sprite.getGlobalBounds().width, sprite.getGlobalBounds().height));
-	box.setPosition(sf::Vector2<float>(sprite.getPosition().x - sprite.getGlobalBounds().width/2, sprite.getPosition().y - sprite.getGlobalBounds().height / 2));
-	sf::CircleShape circle(biggerside / 2);
-	circle.setPosition(sf::Vector2<float>(sprite.getPosition().x - sprite.getGlobalBounds().width / 2, sprite.getPosition().y - sprite.getGlobalBounds().height / 2));
-	circle.setFillColor(sf::Color::Black);
-	window->draw(box);
-	window->draw(circle);*/
 }
