@@ -13,7 +13,7 @@ public:
 	~Formation();
 	
 	int registerSoldier();
-	glm::vec2 GetOffsetForIndex(int index);
+	glm::vec2 GetPositionForIndex(int index);
 	void SetPath(Path* newpath);
 	
 	void Render(sf::RenderWindow* window) override;
@@ -41,5 +41,5 @@ protected:
 
 	Path* pathtofollow;
 	int currentWaypoint = 0;
-	float tolerance = 10.0f;
+	float tolerance = 30.0f;
 };

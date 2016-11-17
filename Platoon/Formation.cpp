@@ -27,7 +27,7 @@ int Formation::registerSoldier()
 	return currIndex - 1;
 }
 
-glm::vec2 Formation::GetOffsetForIndex(int index)
+glm::vec2 Formation::GetPositionForIndex(int index)
 {
 	glm::vec2 offset(offsets.at(index)->getPosition().x, offsets.at(index)->getPosition().y);
 	offset += position;
@@ -38,6 +38,7 @@ glm::vec2 Formation::GetOffsetForIndex(int index)
 void Formation::SetPosition(glm::vec2 pos)
 {
 	position = pos;
+
 }
 
 void Formation::SetPath(Path* newpath)
@@ -54,12 +55,10 @@ void Formation::DebugDraw(sf::RenderWindow* window)
 {
 	for(int i = 0; i < offsets.size(); ++i)
 	{
-
 		sf::CircleShape tmp(*offsets[i]);
 		tmp.setFillColor(sf::Color(40, 40, 120, 120));
-		tmp.setOrigin(tmp.getRadius(), tmp.getRadius());
-		tmp.move(GetOffsetForIndex(i).x, GetOffsetForIndex(i).y);
-		tmp.setRotation(orientation);
+		tmp.setPosition(GetPositionForIndex(i).x, GetPositionForIndex(i).y);
+		//tmp.rotate(orientation);
 		window->draw(tmp);
 	}
 }
@@ -70,7 +69,7 @@ void Formation::Move(sf::Time delta)
 
 	//GetTarget
 	target = pathtofollow->GetPoint(currentWaypoint);
-	if(length(target - position) < tolerance)
+	if(distance(target, position) < tolerance)
 	{
 		currentWaypoint++;
 	}
@@ -89,10 +88,6 @@ void Formation::Move(sf::Time delta)
 void Formation::SetRotation(float rot)
 {
 	orientation = rot;
-	for (auto* obj : offsets)
-	{
-		obj->setRotation(orientation);
-	}
 }
 
 glm::vec2 Formation::Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget)

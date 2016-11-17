@@ -8,7 +8,7 @@
 class Actor : public Renderable, public Collidable, public Moving
 {
 public:
-	Actor(string fileName, int i);
+	Actor(string fileName);
 	Actor(const Actor&);
 	~Actor();
 
@@ -28,6 +28,9 @@ public:
 	glm::vec2 Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
 	glm::vec2 Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
 	glm::vec2 Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
+	glm::vec2 Separate(const glm::vec2 currentVelocity);
+
+	void SetSeparationActors(vector<Actor*> others);
 
 	glm::vec2 truncate(glm::vec2 totrunc, float);
 	void MarkPosition();
@@ -41,15 +44,16 @@ private:
 
 	glm::vec2 target;
 	float maxSpeed;
-	float steeringForce;
+	float maxSteeringForce;
 	float arrivalRadius;
+	float separationTolerance;
 	Formation* formation;
 	std::vector<glm::vec2> path;
+	vector<Actor*> actors;
 
 	float timeSincePoint;
 	vector<sf::CircleShape> trajectory;
 	int targettype;
 	int index;
-	bool isLeader;
 
 };

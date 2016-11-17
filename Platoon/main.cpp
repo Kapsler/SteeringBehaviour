@@ -53,13 +53,43 @@ int main()
 	stufftobefreed.push_back(wedgeFormation);
 
 	//Soldier
-	Actor* tmp = new Actor("./Assets/soldier.png", 0);
+	Actor* tmp = new Actor("./Assets/soldier.png");
 	tmp->setPosition(glm::vec2(498.0f, 498.0f));
 	tmp->setFormation(wedgeFormation);
 	renderObjects.push_back(tmp);
 	movingObjects.push_back(tmp);
 	actorObjects.push_back(tmp);
 	stufftobefreed.push_back(tmp);
+
+	tmp = new Actor("./Assets/soldier.png");
+	tmp->setPosition(glm::vec2(497.0f, 497.0f));
+	tmp->setFormation(wedgeFormation);
+	renderObjects.push_back(tmp);
+	movingObjects.push_back(tmp);
+	actorObjects.push_back(tmp);
+	stufftobefreed.push_back(tmp);
+
+	tmp = new Actor("./Assets/soldier.png");
+	tmp->setPosition(glm::vec2(496.0f, 496.0f));
+	tmp->setFormation(wedgeFormation);
+	renderObjects.push_back(tmp);
+	movingObjects.push_back(tmp);
+	actorObjects.push_back(tmp);
+	stufftobefreed.push_back(tmp);
+
+	tmp = new Actor("./Assets/soldier.png");
+	tmp->setPosition(glm::vec2(495.0f, 495.0f));
+	tmp->setFormation(wedgeFormation);
+	renderObjects.push_back(tmp);
+	movingObjects.push_back(tmp);
+	actorObjects.push_back(tmp);
+	stufftobefreed.push_back(tmp);
+
+	//Give list of actors for separation
+	for(auto* a : actorObjects)
+	{
+		a->SetSeparationActors(actorObjects);
+	}
 
 	//Hardcoded End
 

@@ -1,6 +1,6 @@
 #include "Actor.h"
 
-Actor::Actor(string fileName, int i)
+Actor::Actor(string fileName)
 {
 	//General Attributes
 	renderObject = new RenderObject(fileName);
@@ -16,9 +16,9 @@ Actor::Actor(string fileName, int i)
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
 	maxSpeed = 180.0f;
-	steeringForce = 6.0f;
-	arrivalRadius = 50.0f;
-	isLeader = false;
+	maxSteeringForce = 6.0f;
+	arrivalRadius = 50.0f; 
+	separationTolerance = 30.0f;
 
 	//trajectory
 	timeSincePoint = 0.0f;
@@ -55,16 +55,13 @@ void Actor::setPosition(glm::vec2 pos)
 	position = pos;
 	renderObject->setPosition(pos);
 	boundingCircle->setPosition(sf::Vector2f(position.x - renderObject->sprite.getGlobalBounds().width / 2, position.y - renderObject->sprite.getGlobalBounds().height / 2));
+
 }
 
 void Actor::setFormation(Formation* form)
 {
 	formation = form;
 	index = form->registerSoldier();	
-	if(index == 0)
-	{
-		isLeader = true;
-	}
 }
 
 glm::vec2 Actor::getPosition()
@@ -131,26 +128,36 @@ void Actor::Move(sf::Time deltaTime)
 		timeSincePoint = 0.0f;
 	}
 
-	glm::vec2 steering;
+	glm::vec2 blendedSteering, moveSteering, separationSteering;
 	
-	target = formation->GetOffsetForIndex(index);
+	target = formation->GetPositionForIndex(index);
 
+	//What to do
 	switch(targettype)
 	{
 	case 1:
-		steering = Seek(velocity, target);
+		moveSteering = Seek(velocity, target);
 		break;
 	case 2:
-		steering = Arrive(velocity, target);
+		moveSteering = Arrive(velocity, target);
 		break;
 	case 3:
-		steering = Flee(velocity, target);
+		moveSteering = Flee(velocity, target);
 		break;
 	default:
 		break;
 	}
 
-	velocity = velocity + steering * deltaTime.asSeconds() * 100.0f;
+	//Separation
+	separationSteering = Separate(velocity);
+
+	//Blending
+	blendedSteering = moveSteering * 1.0f;
+	blendedSteering += separationSteering * 5.0f;
+
+	truncate(blendedSteering, maxSteeringForce);
+
+	velocity = velocity + blendedSteering * deltaTime.asSeconds() * 100.0f;
 	velocity = truncate(velocity, maxSpeed) ;
 	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
 	{
@@ -164,7 +171,7 @@ glm::vec2 Actor::Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 	glm::vec2 desiredVelocity = glm::normalize(currentTarget - position) * maxSpeed;
 	glm::vec2 newSteering = desiredVelocity - currentVelocity;
 
-	newSteering = truncate(newSteering, steeringForce);
+	newSteering = truncate(newSteering, maxSteeringForce);
 
 	return newSteering;
 }
@@ -174,7 +181,7 @@ glm::vec2 Actor::Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 	glm::vec2 desiredVelocity = glm::normalize(position - currentTarget) * maxSpeed;
 	glm::vec2 newSteering = desiredVelocity - currentVelocity;
 
-	newSteering = truncate(newSteering, steeringForce);
+	newSteering = truncate(newSteering, maxSteeringForce);
 
 	return newSteering;
 }
@@ -195,9 +202,38 @@ glm::vec2 Actor::Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget
 	glm::vec2 newSteering;
 	newSteering = desiredVelocity - currentVelocity;
 	
-	newSteering = truncate(newSteering, steeringForce);
+	newSteering = truncate(newSteering, maxSteeringForce);
 
 	return newSteering;
+}
+
+glm::vec2 Actor::Separate(const glm::vec2 currentVelocity)
+{
+	glm::vec2 separation = glm::vec2(0.0f, 0.0f);
+	int count = 0;
+	float distance;
+
+	for(auto* a : actors)
+	{
+		distance = glm::distance(position, a->getPosition());
+		if(distance > 0 && distance < separationTolerance)
+		{
+			cout << "GET AWAY FROM ME!" << endl;
+			separation = Flee(currentVelocity, a->getPosition());
+		}
+	}
+
+	if(count > 0)
+	{
+		separation /= count;
+	}
+
+	return separation;
+}
+
+void Actor::SetSeparationActors(vector<Actor*> others)
+{
+	actors = others;
 }
 
 glm::vec2 Actor::truncate(glm::vec2 totrunc, float max)
