@@ -143,8 +143,8 @@ int main()
 		//Render stuff
 		for(auto obj : renderObjects)
 		{
-			DebugRender(obj, &window);
 			obj->Render(&window);
+			DebugRender(obj, &window);
 		}
 
 		window.display();

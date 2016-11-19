@@ -74,4 +74,12 @@ private:
 	int targettype;
 	int index;
 
+	struct intersection
+	{
+		sf::FloatRect rect;
+		float rot;
+	};
+
+	vector<intersection> intersections;
+
 };

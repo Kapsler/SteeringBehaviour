@@ -125,9 +125,9 @@ void Agent::DebugDraw(sf::RenderWindow* window)
 
 	window->draw(targetshape);
 
-	sf::Vertex* line = new sf::Vertex[2];
-	sf::Vector2f tmp1, tmp2;
-	//Draw whiskers
+	//sf::Vertex* line = new sf::Vertex[2];
+	//sf::Vector2f tmp1, tmp2;
+	////Draw whiskers
 	//tmp1 = sf::Vector2f(whiskerMiddle.origin.x, whiskerMiddle.origin.y);
 	//line[0] = sf::Vertex(tmp1, sf::Color::Magenta);
 	//tmp2 = sf::Vector2f(whiskerMiddle.origin.x + whiskerMiddle.direction.x * whiskerMiddle.length, whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
@@ -146,6 +146,8 @@ void Agent::DebugDraw(sf::RenderWindow* window)
 	//line[1] = sf::Vertex(tmp2, sf::Color::Magenta);
 	//window->draw(line, 2, sf::LineStrip);
 
+	//delete[] line;
+
 	middleWhisker.setFillColor(sf::Color::Magenta);
 	window->draw(middleWhisker);
 	leftWhisker.setFillColor(sf::Color::Magenta);
@@ -153,7 +155,17 @@ void Agent::DebugDraw(sf::RenderWindow* window)
 	rightWhisker.setFillColor(sf::Color::Magenta);
 	window->draw(rightWhisker);
 
-	delete[] line;
+	for(auto i : intersections)
+	{
+		sf::RectangleShape rec;
+		rec.setSize(sf::Vector2f(i.rect.width, i.rect.height));
+		rec.setPosition(i.rect.left, i.rect.top);
+		rec.setRotation(i.rot);
+		rec.setFillColor(sf::Color::Cyan);
+		window->draw(rec);
+	}
+
+
 }
 
 void Agent::Move(sf::Time deltaTime)
@@ -193,8 +205,8 @@ void Agent::Move(sf::Time deltaTime)
 
 	//Blending
 	blendedSteering = moveSteering * 1.0f;
-	blendedSteering += separationSteering * 5.0f;
-	blendedSteering += avoidanceSteering * 3.0f;
+	blendedSteering += separationSteering * 3.0f;
+	blendedSteering += avoidanceSteering * 5.0f;
 
 	truncate(blendedSteering, maxSteeringForce);
 
@@ -260,7 +272,7 @@ glm::vec2 Agent::Separate(const glm::vec2 currentVelocity)
 		distance = glm::distance(position, a->getPosition());
 		if(distance > 0 && distance < separationTolerance)
 		{
-			cout << "GET AWAY FROM ME!" << endl;
+			//cout << "GET AWAY FROM ME!" << endl;
 			separation = Flee(currentVelocity, a->getPosition());
 		}
 	}
@@ -286,6 +298,10 @@ glm::vec2 Agent::AvoidObstacles(const glm::vec2 currentVelocity)
 	//leftPoint.y = (whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
 	//rightPoint.x = (whiskerMiddle.origin.x + whiskerMiddle.direction.x * whiskerMiddle.length);
 	//rightPoint.y = (whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
+
+	intersections.clear();
+
+	intersection inter;
 
 	for(auto o : *obstacles)
 	{
@@ -319,25 +335,31 @@ glm::vec2 Agent::AvoidObstacles(const glm::vec2 currentVelocity)
 		//	//FInd intersection of line, apply normal vector
 		//}
 
-		if(o.intersects(middleWhisker.getGlobalBounds()))
+		if(o.intersects(middleWhisker.getGlobalBounds(), inter.rect))
 		{
 			sf::Vector2f point = leftWhisker.getPoint(1);
 			avoidance += Seek(currentVelocity, glm::vec2(leftWhisker.getTransform().transformPoint(point).x, leftWhisker.getTransform().transformPoint(point).y));
 			count++;
+			inter.rot = middleWhisker.getRotation();
+			intersections.push_back(inter);
 		}
 
-		if(o.intersects(leftWhisker.getGlobalBounds()))
+		if(o.intersects(leftWhisker.getGlobalBounds(), inter.rect))
 		{
 			sf::Vector2f point = rightWhisker.getPoint(1);
 			avoidance += Seek(currentVelocity, glm::vec2(rightWhisker.getTransform().transformPoint(point).x, rightWhisker.getTransform().transformPoint(point).y));
 			count++;
+			inter.rot = leftWhisker.getRotation();
+			intersections.push_back(inter);
 		}
 
-		if(o.intersects(rightWhisker.getGlobalBounds()))
+		if(o.intersects(rightWhisker.getGlobalBounds(), inter.rect))
 		{
 			sf::Vector2f point = leftWhisker.getPoint(1);
 			avoidance += Seek(currentVelocity, glm::vec2(leftWhisker.getTransform().transformPoint(point).x, leftWhisker.getTransform().transformPoint(point).y));
 			count++;
+			inter.rot = rightWhisker.getRotation();
+			intersections.push_back(inter);
 		}
 	}
 	
