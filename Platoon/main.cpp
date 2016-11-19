@@ -1,15 +1,17 @@
 #include <SFML/Graphics.hpp>
 #include "RenderObject.h"
-#include "Actor.h"
+#include "Agent.h"
 #include <glm/glm.hpp>
 #include "WedgeFormation.h"
 #include "Path.h"
+#include "Wall.h"
 
 std::vector<Renderable*> renderObjects;
 std::vector<Moving*> movingObjects;
-std::vector<Actor*> actorObjects;
+std::vector<Agent*> actorObjects;
 std::vector<Formation*> formations;
 std::vector<void*> stufftobefreed;
+std::vector<sf::FloatRect> obstacles;
 
 int screenWidth = 1000;
 int screenHeight = 1000;
@@ -36,9 +38,15 @@ int main()
 	//Hardcoded
 	//floor
 	RenderObject* floor = new RenderObject("./Assets/floor.jpg", glm::vec2(screenWidth / 2, screenHeight / 2));
-	renderObjects.push_back(floor); 
+	renderObjects.push_back(floor);
 	stufftobefreed.push_back(floor);
 	
+	//Obstacles
+	Wall* wall = new Wall(glm::vec2(screenHeight * (4.0f/5.0f) , screenWidth * (4.0f/5.0f)));
+	renderObjects.push_back(wall);
+	obstacles.push_back(wall->GetBoundingBox());
+	stufftobefreed.push_back(wall);
+
 	//Path
 	Path* path = new Path();
 	renderObjects.push_back(path);
@@ -53,7 +61,7 @@ int main()
 	stufftobefreed.push_back(wedgeFormation);
 
 	//Soldier
-	Actor* tmp = new Actor("./Assets/soldier.png");
+	Agent* tmp = new Agent("./Assets/soldier.png");
 	tmp->setPosition(glm::vec2(498.0f, 498.0f));
 	tmp->setFormation(wedgeFormation);
 	renderObjects.push_back(tmp);
@@ -61,34 +69,35 @@ int main()
 	actorObjects.push_back(tmp);
 	stufftobefreed.push_back(tmp);
 
-	tmp = new Actor("./Assets/soldier.png");
-	tmp->setPosition(glm::vec2(497.0f, 497.0f));
-	tmp->setFormation(wedgeFormation);
-	renderObjects.push_back(tmp);
-	movingObjects.push_back(tmp);
-	actorObjects.push_back(tmp);
-	stufftobefreed.push_back(tmp);
+	//tmp = new Agent("./Assets/soldier.png");
+	//tmp->setPosition(glm::vec2(497.0f, 497.0f));
+	//tmp->setFormation(wedgeFormation);
+	//renderObjects.push_back(tmp);
+	//movingObjects.push_back(tmp);
+	//actorObjects.push_back(tmp);
+	//stufftobefreed.push_back(tmp);
 
-	tmp = new Actor("./Assets/soldier.png");
-	tmp->setPosition(glm::vec2(496.0f, 496.0f));
-	tmp->setFormation(wedgeFormation);
-	renderObjects.push_back(tmp);
-	movingObjects.push_back(tmp);
-	actorObjects.push_back(tmp);
-	stufftobefreed.push_back(tmp);
+	//tmp = new Agent("./Assets/soldier.png");
+	//tmp->setPosition(glm::vec2(496.0f, 496.0f));
+	//tmp->setFormation(wedgeFormation);
+	//renderObjects.push_back(tmp);
+	//movingObjects.push_back(tmp);
+	//actorObjects.push_back(tmp);
+	//stufftobefreed.push_back(tmp);
 
-	tmp = new Actor("./Assets/soldier.png");
-	tmp->setPosition(glm::vec2(495.0f, 495.0f));
-	tmp->setFormation(wedgeFormation);
-	renderObjects.push_back(tmp);
-	movingObjects.push_back(tmp);
-	actorObjects.push_back(tmp);
-	stufftobefreed.push_back(tmp);
+	//tmp = new Agent("./Assets/soldier.png");
+	//tmp->setPosition(glm::vec2(495.0f, 495.0f));
+	//tmp->setFormation(wedgeFormation);
+	//renderObjects.push_back(tmp);
+	//movingObjects.push_back(tmp);
+	//actorObjects.push_back(tmp);
+	//stufftobefreed.push_back(tmp);
 
 	//Give list of actors for separation
 	for(auto* a : actorObjects)
 	{
-		a->SetSeparationActors(actorObjects);
+		a->SetSeparationActors(&actorObjects);
+		a->SetObstacles(&obstacles);
 	}
 
 	//Hardcoded End

@@ -145,21 +145,23 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Agent.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Formation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Moving.cpp" />
+    <ClCompile Include="Wall.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="Renderable.cpp" />
     <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="WedgeFormation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor.h" />
+    <ClInclude Include="Agent.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="Formation.h" />
     <ClInclude Include="Moving.h" />
+    <ClInclude Include="Wall.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderObject.h" />

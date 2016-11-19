@@ -1,6 +1,6 @@
-#include "Actor.h"
+#include "Agent.h"
 
-Actor::Actor(string fileName)
+Agent::Agent(string fileName)
 {
 	//General Attributes
 	renderObject = new RenderObject(fileName);
@@ -20,6 +20,19 @@ Actor::Actor(string fileName)
 	arrivalRadius = 50.0f; 
 	separationTolerance = 30.0f;
 
+	//Feelers
+	whiskerMiddle.origin = position;
+	whiskerMiddle.direction = normalize(velocity);
+	whiskerMiddle.length = 30.0f;
+
+	whiskerLeft.origin = position;
+	whiskerLeft.direction = normalize(glm::rotate(velocity, -20.0f));
+	whiskerLeft.length = 20.0f;
+
+	whiskerRight.origin = position;
+	whiskerRight.direction = normalize(glm::rotate(velocity, 20.0f));
+	whiskerRight.length = 20.0f;
+
 	//trajectory
 	timeSincePoint = 0.0f;
 
@@ -31,11 +44,11 @@ Actor::Actor(string fileName)
 	//Target end
 }
 
-Actor::Actor(const Actor&)
+Agent::Agent(const Agent&)
 {
 }
 
-Actor::~Actor()
+Agent::~Agent()
 {
 	delete boundingCircle;
 	boundingCircle = nullptr;
@@ -44,7 +57,7 @@ Actor::~Actor()
 	renderObject = nullptr;
 }
 
-void Actor::setPosition(glm::vec2 pos)
+void Agent::setPosition(glm::vec2 pos)
 {
 	//Bind in screen
 	if (pos.x < 0) pos.x = 0;
@@ -58,39 +71,29 @@ void Actor::setPosition(glm::vec2 pos)
 
 }
 
-void Actor::setFormation(Formation* form)
+void Agent::setFormation(Formation* form)
 {
 	formation = form;
 	index = form->registerSoldier();	
 }
 
-glm::vec2 Actor::getPosition()
+glm::vec2 Agent::getPosition()
 {
 	return position;
 }
 
-void Actor::setRotation(float rot)
+void Agent::setRotation(float rot)
 {
 	renderObject->setRotation(rot);
 	//boundingCircle->setRotation(rot);
 }
 
-float Actor::GetRotation()
+float Agent::GetRotation()
 {
 	return renderObject->sprite.getRotation();
 }
 
-bool Actor::Intersect(sf::CircleShape* circle)
-{
-	return false;
-}
-
-bool Actor::Intersect(sf::FloatRect* rect)
-{
-	return false;
-}
-
-void Actor::Render(sf::RenderWindow* window)
+void Agent::Render(sf::RenderWindow* window)
 {
 	renderObject->Render(window);
 	for(auto i : trajectory)
@@ -99,7 +102,7 @@ void Actor::Render(sf::RenderWindow* window)
 	}
 }
 
-void Actor::DebugDraw(sf::RenderWindow* window)
+void Agent::DebugDraw(sf::RenderWindow* window)
 {
 	//Debug Fill Color
 	boundingCircle->setFillColor(sf::Color(180, 40, 40, 120));
@@ -117,9 +120,32 @@ void Actor::DebugDraw(sf::RenderWindow* window)
 	targetshape.setPosition(target.x - targetshape.getRadius(), target.y - targetshape.getRadius());
 
 	window->draw(targetshape);
+
+	sf::Vertex* line = new sf::Vertex[2];
+	sf::Vector2f tmp1, tmp2;
+	//Draw whiskers
+	tmp1 = sf::Vector2f(whiskerMiddle.origin.x, whiskerMiddle.origin.y);
+	line[0] = sf::Vertex(tmp1, sf::Color::Magenta);
+	tmp2 = sf::Vector2f(whiskerMiddle.origin.x + whiskerMiddle.direction.x * whiskerMiddle.length, whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
+	line[1] = sf::Vertex(tmp2, sf::Color::Magenta);
+	window->draw(line, 2, sf::LineStrip);
+
+	tmp1 = sf::Vector2f(whiskerLeft.origin.x, whiskerLeft.origin.y);
+	line[0] = sf::Vertex(tmp1, sf::Color::Magenta);
+	tmp2 = sf::Vector2f(whiskerLeft.origin.x + whiskerLeft.direction.x * whiskerLeft.length, whiskerLeft.origin.y + whiskerLeft.direction.y * whiskerLeft.length);
+	line[1] = sf::Vertex(tmp2, sf::Color::Magenta);
+	window->draw(line, 2, sf::LineStrip);
+
+	tmp1 = sf::Vector2f(whiskerRight.origin.x, whiskerRight.origin.y);
+	line[0] = sf::Vertex(tmp1, sf::Color::Magenta);
+	tmp2 = sf::Vector2f(whiskerRight.origin.x + whiskerRight.direction.x * whiskerRight.length, whiskerRight.origin.y + whiskerRight.direction.y * whiskerRight.length);
+	line[1] = sf::Vertex(tmp2, sf::Color::Magenta);
+	window->draw(line, 2, sf::LineStrip);
+
+	delete[] line;
 }
 
-void Actor::Move(sf::Time deltaTime)
+void Agent::Move(sf::Time deltaTime)
 {
 	timeSincePoint += deltaTime.asSeconds();
 	if(timeSincePoint > 0.25f)
@@ -128,7 +154,7 @@ void Actor::Move(sf::Time deltaTime)
 		timeSincePoint = 0.0f;
 	}
 
-	glm::vec2 blendedSteering, moveSteering, separationSteering;
+	glm::vec2 blendedSteering, moveSteering, separationSteering, avoidanceSteering;
 	
 	target = formation->GetPositionForIndex(index);
 
@@ -151,9 +177,13 @@ void Actor::Move(sf::Time deltaTime)
 	//Separation
 	separationSteering = Separate(velocity);
 
+	//Avoidance
+	avoidanceSteering = AvoidObstacles(velocity);
+
 	//Blending
 	blendedSteering = moveSteering * 1.0f;
 	blendedSteering += separationSteering * 5.0f;
+	blendedSteering += avoidanceSteering * 50.0f;
 
 	truncate(blendedSteering, maxSteeringForce);
 
@@ -162,11 +192,12 @@ void Actor::Move(sf::Time deltaTime)
 	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
 	{
 		setPosition(position + velocity * deltaTime.asSeconds());
-		setRotation(atan2(normalize(velocity).y, normalize(velocity).x) * 180.0f / 3.1415926f);
+		setRotation(atan2(normalize(velocity).y, normalize(velocity).x) * 180.0f / 3.1415926f); 
+		RepositionWhiskers();
 	}
 }
 
-glm::vec2 Actor::Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
+glm::vec2 Agent::Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 {
 	glm::vec2 desiredVelocity = glm::normalize(currentTarget - position) * maxSpeed;
 	glm::vec2 newSteering = desiredVelocity - currentVelocity;
@@ -176,7 +207,7 @@ glm::vec2 Actor::Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 	return newSteering;
 }
 
-glm::vec2 Actor::Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
+glm::vec2 Agent::Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 {
 	glm::vec2 desiredVelocity = glm::normalize(position - currentTarget) * maxSpeed;
 	glm::vec2 newSteering = desiredVelocity - currentVelocity;
@@ -186,7 +217,7 @@ glm::vec2 Actor::Flee(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 	return newSteering;
 }
 
-glm::vec2 Actor::Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
+glm::vec2 Agent::Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget)
 {
 	glm::vec2 desiredVelocity = currentTarget - position;
 	float distance = glm::distance(currentTarget, position);
@@ -207,13 +238,13 @@ glm::vec2 Actor::Arrive(const glm::vec2 currentVelocity, glm::vec2 currentTarget
 	return newSteering;
 }
 
-glm::vec2 Actor::Separate(const glm::vec2 currentVelocity)
+glm::vec2 Agent::Separate(const glm::vec2 currentVelocity)
 {
 	glm::vec2 separation = glm::vec2(0.0f, 0.0f);
 	int count = 0;
 	float distance;
 
-	for(auto* a : actors)
+	for(auto* a : *actors)
 	{
 		distance = glm::distance(position, a->getPosition());
 		if(distance > 0 && distance < separationTolerance)
@@ -231,12 +262,84 @@ glm::vec2 Actor::Separate(const glm::vec2 currentVelocity)
 	return separation;
 }
 
-void Actor::SetSeparationActors(vector<Actor*> others)
+glm::vec2 Agent::AvoidObstacles(const glm::vec2 currentVelocity)
+{
+	glm::vec2 avoidance = glm::vec2(0.0f, 0.0f);
+	int count = 0;
+
+	sf::Vector2f middlePoint, leftPoint, rightPoint;
+
+	middlePoint.x = (whiskerMiddle.origin.x + whiskerMiddle.direction.x * whiskerMiddle.length);
+	middlePoint.y = (whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
+	leftPoint.x = (whiskerMiddle.origin.x + whiskerMiddle.direction.x * whiskerMiddle.length);
+	leftPoint.y = (whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
+	rightPoint.x = (whiskerMiddle.origin.x + whiskerMiddle.direction.x * whiskerMiddle.length);
+	rightPoint.y = (whiskerMiddle.origin.y + whiskerMiddle.direction.y * whiskerMiddle.length);
+
+	for(auto o : *obstacles)
+	{
+		//Collision Middle
+		if (o.contains(middlePoint))
+		{
+			cout << "Collision" << endl;
+			avoidance += Seek(currentVelocity, whiskerLeft.origin + whiskerLeft.direction * whiskerLeft.length);
+
+			//TODO LineLine Collision
+			//FInd intersection of line, apply normal vector
+		}
+
+		//Collision Left
+		if(o.contains(leftPoint))
+		{
+			cout << "Collision" << endl;
+			avoidance += Seek(currentVelocity, whiskerRight.origin + whiskerRight.direction * whiskerRight.length);
+
+			//TODO LineLine Collision
+			//FInd intersection of line, apply normal vector
+		}
+
+		//Collision Right
+		if (o.contains(rightPoint))
+		{
+			cout << "Collision" << endl;
+			avoidance += Seek(currentVelocity, whiskerLeft.origin + whiskerLeft.direction * whiskerLeft.length);
+
+			//TODO LineLine Collision
+			//FInd intersection of line, apply normal vector
+		}
+	}
+	
+	if (count > 0)
+	{
+		avoidance /= count;
+	}
+
+	return avoidance;
+}
+
+void Agent::SetSeparationActors(vector<Agent*> *others)
 {
 	actors = others;
 }
 
-glm::vec2 Actor::truncate(glm::vec2 totrunc, float max)
+void Agent::SetObstacles(vector<sf::FloatRect> *others)
+{
+	obstacles = others;
+}
+
+void Agent::RepositionWhiskers()
+{
+	whiskerMiddle.origin = position;
+	whiskerMiddle.direction = normalize(velocity);
+
+	whiskerLeft.origin = position;
+	whiskerLeft.direction = rotate(normalize(velocity), -0.5f);
+
+	whiskerRight.origin = position;
+	whiskerRight.direction = rotate(normalize(velocity), 0.5f);
+}
+
+glm::vec2 Agent::truncate(glm::vec2 totrunc, float max)
 {
 	float i = max / glm::length(totrunc);
 	if(i > 1.0f)
@@ -247,7 +350,7 @@ glm::vec2 Actor::truncate(glm::vec2 totrunc, float max)
 	return totrunc * i;
 }
 
-void Actor::MarkPosition()
+void Agent::MarkPosition()
 {
 	if(trajectory.size() > 50)
 	{
@@ -262,7 +365,7 @@ void Actor::MarkPosition()
 	trajectory.push_back(sf::CircleShape(newpoint));
 }
 
-void Actor::ToggleTargetType()
+void Agent::ToggleTargetType()
 {
 	targettype++;
 	if (targettype > 3) targettype = 1;

@@ -41,5 +41,5 @@ protected:
 
 	Path* pathtofollow;
 	int currentWaypoint = 0;
-	float tolerance = 30.0f;
+	float tolerance = 5.0f;
 };

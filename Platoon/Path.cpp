@@ -43,6 +43,8 @@ void Path::DebugDraw(sf::RenderWindow* window)
 			window->draw(line, 2, sf::LineStrip);
 		}
 	}
+
+	delete[] line;
 	
 }
 

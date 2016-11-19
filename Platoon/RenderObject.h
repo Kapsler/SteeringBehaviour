@@ -15,6 +15,7 @@ public:
 	void setPosition(glm::vec2 pos);
 	void setRotation(float rot);
 
+	sf::FloatRect GetBoundingBox();
 
 	void Render(sf::RenderWindow* window) override;
 	void DebugDraw(sf::RenderWindow* window);

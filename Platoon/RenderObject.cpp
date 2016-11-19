@@ -36,6 +36,11 @@ void RenderObject::setRotation(float rot)
 	sprite.setRotation(rot);
 }
 
+sf::FloatRect RenderObject::GetBoundingBox()
+{
+	return sprite.getGlobalBounds();
+}
+
 void RenderObject::Render(sf::RenderWindow* window)
 {
 	window->draw(sprite);
