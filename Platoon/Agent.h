@@ -60,6 +60,10 @@ private:
 		float length;
 	};
 
+	sf::RectangleShape middleWhisker;
+	sf::RectangleShape leftWhisker;
+	sf::RectangleShape rightWhisker;
+
 	feeler whiskerMiddle;
 	feeler whiskerLeft;
 	feeler whiskerRight;
