@@ -30,7 +30,10 @@ public:
 	glm::vec2 AvoidObstacles(const glm::vec2 currentVelocity);
 
 	void SetSeparationActors(vector<Agent*> *others);
-	void SetObstacles(vector<sf::FloatRect> *others);
+	void SetObstacles(vector<sf::RectangleShape> *others);
+
+	bool LineIntersection(glm::vec2 A, glm::vec2 B, glm::vec2 C, glm::vec2 D, float& u);
+	static float crossVec2(const glm::vec2& a, const glm::vec2& b);
 
 	void RepositionWhiskers();
 
@@ -41,6 +44,7 @@ public:
 private:
 	glm::vec2 position;
 	glm::vec2 velocity;
+	float orientation;
 	RenderObject* renderObject;
 	sf::CircleShape* boundingCircle;
 
@@ -58,28 +62,30 @@ private:
 		glm::vec2 origin;
 		glm::vec2 direction;
 		float length;
+		char tag;
 	};
-
+/*
 	sf::RectangleShape middleWhisker;
 	sf::RectangleShape leftWhisker;
-	sf::RectangleShape rightWhisker;
+	sf::RectangleShape rightWhisker;*/
 
 	feeler whiskerMiddle;
 	feeler whiskerLeft;
 	feeler whiskerRight;
-	vector<sf::FloatRect> *obstacles;
+	vector<feeler*> feelers;
+	vector<sf::RectangleShape> *obstacles;
 
 	float timeSincePoint;
 	vector<sf::CircleShape> trajectory;
 	int targettype;
 	int index;
 
-	struct intersection
+	struct line
 	{
-		sf::FloatRect rect;
-		float rot;
+		glm::vec2 start;
+		glm::vec2 end;
 	};
 
-	vector<intersection> intersections;
+	vector<line> linestodraw;
 
 };

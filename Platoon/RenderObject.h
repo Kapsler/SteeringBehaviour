@@ -12,10 +12,13 @@ public:
 	RenderObject(const RenderObject& other);
 	~RenderObject();
 
-	void setPosition(glm::vec2 pos);
-	void setRotation(float rot);
+	void SetPosition(glm::vec2 pos);
+	void SetRotation(float rot);
+	void SetScale(float x, float y);
+	void Scale(float x, float y);
+	void Rotate(float rot);
 
-	sf::FloatRect GetBoundingBox();
+	sf::RectangleShape GetBoundingBox() const;
 
 	void Render(sf::RenderWindow* window) override;
 	void DebugDraw(sf::RenderWindow* window);
@@ -23,5 +26,7 @@ public:
 	sf::Texture texture;
 	sf::Sprite sprite;
 private:
+	sf::RectangleShape boundingbox;
+
 };
 

@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="Agent.cpp" />
     <ClCompile Include="Collidable.cpp" />
+    <ClCompile Include="Crate.cpp" />
     <ClCompile Include="Formation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Moving.cpp" />
@@ -159,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="Agent.h" />
     <ClInclude Include="Collidable.h" />
+    <ClInclude Include="Crate.h" />
     <ClInclude Include="Formation.h" />
     <ClInclude Include="Moving.h" />
     <ClInclude Include="Wall.h" />

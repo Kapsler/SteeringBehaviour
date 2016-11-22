@@ -5,13 +5,14 @@
 #include "WedgeFormation.h"
 #include "Path.h"
 #include "Wall.h"
+#include "Crate.h"
 
 std::vector<Renderable*> renderObjects;
 std::vector<Moving*> movingObjects;
 std::vector<Agent*> actorObjects;
 std::vector<Formation*> formations;
 std::vector<void*> stufftobefreed;
-std::vector<sf::FloatRect> obstacles;
+std::vector<sf::RectangleShape> obstacles;
 
 int screenWidth = 1000;
 int screenHeight = 1000;
@@ -46,6 +47,17 @@ int main()
 	renderObjects.push_back(wall);
 	obstacles.push_back(wall->GetBoundingBox());
 	stufftobefreed.push_back(wall);
+
+	wall = new Wall(glm::vec2(screenHeight * (1.0f / 2.0f), screenWidth * (1.0f / 10.0f)));
+	wall->Rotate(45);
+	renderObjects.push_back(wall);
+	obstacles.push_back(wall->GetBoundingBox());
+	stufftobefreed.push_back(wall);
+
+	Crate* crate = new Crate(glm::vec2(screenHeight * (9.0f / 10.0f), screenWidth * (1.0f / 2.0f)));
+	renderObjects.push_back(crate);
+	obstacles.push_back(crate->GetBoundingBox());
+	stufftobefreed.push_back(crate);
 
 	//Path
 	Path* path = new Path();
@@ -133,7 +145,6 @@ int main()
 
 		window.clear();
 
-
 		//Move stuff
 		for(const auto& obj : movingObjects)
 		{
@@ -141,7 +152,7 @@ int main()
 		}
 
 		//Render stuff
-		for(auto obj : renderObjects)
+		for(auto& obj : renderObjects)
 		{
 			obj->Render(&window);
 			DebugRender(obj, &window);
