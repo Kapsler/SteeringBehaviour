@@ -9,6 +9,12 @@
 class Formation : public Renderable, public Moving
 {
 public:
+	struct Location
+	{
+		float orientation;
+		float distance;
+	};
+
 	Formation();
 	~Formation();
 	
@@ -23,11 +29,14 @@ public:
 	void SetRotation(float rot);
 	void SetPosition(glm::vec2 pos);
 
+	void AddSlot(Location tmp);
+	void AddSlot(float orient, float dist);
+
 	glm::vec2 Seek(const glm::vec2 currentVelocity, glm::vec2 currentTarget);
 	glm::vec2 truncate(glm::vec2 totrunc, float) const;
 
 protected:
-	std::vector<sf::CircleShape*> offsets;
+	std::vector<Location> slots;
 	int currIndex;
 
 	glm::vec2 position;

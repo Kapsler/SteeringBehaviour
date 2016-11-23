@@ -2,12 +2,6 @@
 
 Path::Path()
 {
-	AddPoint(glm::vec2(500.0f, 500.0f));
-	AddPoint(glm::vec2(900.0f, 900.0f));
-	AddPoint(glm::vec2(900.0f, 100.0f));
-	AddPoint(glm::vec2(100.0f, 100.0f));
-	AddPoint(glm::vec2(100.0f, 900.0f));
-	AddPoint(glm::vec2(500.0f, 500.0f));
 }
 
 Path::~Path()
@@ -26,7 +20,7 @@ void Path::DebugDraw(sf::RenderWindow* window)
 	{
 		//Point
 		sf::CircleShape pt;
-		pt.setRadius(10);
+		pt.setRadius(5);
 		pt.setOrigin(pt.getRadius(), pt.getRadius());
 		pt.move(waypoints[i].x, waypoints[i].y);
 		pt.setFillColor(sf::Color::Yellow);
@@ -58,8 +52,16 @@ glm::vec2 Path::GetPoint(int index)
 	if(index < waypoints.size())
 	{
 		return waypoints[index];
-	} else
+	} if(cycle)
 	{
 		return waypoints[index%waypoints.size()];
+	} else
+	{
+		return waypoints[waypoints.size() - 1];
 	}
-} 
+}
+
+void Path::SetCycle(bool newstate)
+{
+	cycle = newstate;
+}

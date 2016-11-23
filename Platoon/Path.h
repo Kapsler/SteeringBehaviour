@@ -15,8 +15,11 @@ public:
 	void AddPoint(glm::vec2 newpoint);
 	glm::vec2 GetPoint(int index);
 
+	void SetCycle(bool newstate);
+
 
 private:
 	std::vector<glm::vec2> waypoints;
 
+	bool cycle = false;
 };

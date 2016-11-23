@@ -1,5 +1,6 @@
 #include "Formation.h"
 #include <iostream>
+#include <glm/gtx/rotate_vector.hpp>
 
 Formation::Formation()
 {
@@ -9,16 +10,15 @@ Formation::Formation()
 	velocity.x = 0.0f;
 	velocity.y = 0.0f;
 
-	maxSpeed = 120.0f;
+	maxSpeed = 80.0f;
 	steeringForce = 4.0f;
+
+	//Leader
+	AddSlot(0.0f, 0.0f);
 }
 
 Formation::~Formation()
 {
-	for(auto i : offsets)
-	{
-		delete i;
-	}
 }
 
 int Formation::registerSoldier()
@@ -29,16 +29,30 @@ int Formation::registerSoldier()
 
 glm::vec2 Formation::GetPositionForIndex(int index)
 {
-	glm::vec2 offset(offsets.at(index)->getPosition().x, offsets.at(index)->getPosition().y);
-	offset += position;
+	glm::vec2 newoffset;
+	Location currentLocation = slots.at(index%slots.size());
+	newoffset = position + glm::rotate(glm::normalize(velocity), currentLocation.orientation) * currentLocation.distance;
 
-	return offset;
+	return newoffset;
 }
 
 void Formation::SetPosition(glm::vec2 pos)
 {
 	position = pos;
 
+}
+
+void Formation::AddSlot(Location tmp)
+{
+	slots.push_back(tmp);
+}
+
+void Formation::AddSlot(float orient, float dist)
+{
+	Location tmp;
+	tmp.orientation = orient;
+	tmp.distance = dist;
+	slots.push_back(tmp);
 }
 
 void Formation::SetPath(Path* newpath)
@@ -53,9 +67,11 @@ void Formation::Render(sf::RenderWindow* window)
 
 void Formation::DebugDraw(sf::RenderWindow* window)
 {
-	for(int i = 0; i < offsets.size(); ++i)
+	for(int i = 0; i < slots.size(); ++i)
 	{
-		sf::CircleShape tmp(*offsets[i]);
+		sf::CircleShape tmp;
+		tmp.setRadius(4);
+		tmp.setOrigin(tmp.getRadius(), tmp.getRadius());
 		tmp.setFillColor(sf::Color(40, 40, 120, 120));
 		tmp.setPosition(GetPositionForIndex(i).x, GetPositionForIndex(i).y);
 		//tmp.rotate(orientation);
