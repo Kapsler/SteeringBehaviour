@@ -38,12 +38,8 @@ Agent::Agent(string fileName)
 	//trajectory
 	timeSincePoint = 0.0f;
 
-	//Hardcoded Target
-	target.x = 800.0f;
-	target.y = 800.0f;
 	targettype = 1;
 	ToggleTargetType();
-	//Target end
 }
 
 Agent::Agent(const Agent&)
@@ -186,7 +182,7 @@ void Agent::Move(sf::Time deltaTime)
 	blendedSteering = moveSteering * 1.0f;
 	blendedSteering += separationSteering * 4.0f;
 	blendedSteering += avoidanceSteering * 5.0f;
-	blendedSteering += evadeSteering * 1.6f;
+	blendedSteering += evadeSteering * 1.2f;
 
 	truncate(blendedSteering, maxSteeringForce);
 

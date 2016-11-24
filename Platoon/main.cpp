@@ -44,7 +44,7 @@ void InitEnemies()
 
 	//Enemy Formation 1
 	Formation* enemyFormation = new Formation();
-	enemyFormation->SetPosition(glm::vec2(501.0f, 501.0f));
+	enemyFormation->SetPosition(glm::vec2(501.0f, 271.0f));
 	enemyFormation->SetPath(enemyPath);
 	renderObjects.push_back(enemyFormation);
 	movingObjects.push_back(enemyFormation);
@@ -52,7 +52,7 @@ void InitEnemies()
 
 	//Enemie 1
 	Agent* enemy = new Agent("./Assets/zombie.png");
-	enemy->setPosition(glm::vec2(500.0f, 500.0f));
+	enemy->setPosition(glm::vec2(500.0f, 271.0f));
 	enemy->setFormation(enemyFormation);
 	renderObjects.push_back(enemy);
 	enemyObjects.push_back(enemy);
