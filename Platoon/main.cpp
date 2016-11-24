@@ -137,6 +137,32 @@ void InitEnemies()
 	separationObjects.push_back(enemy4);
 	movingObjects.push_back(enemy4);
 	stufftobefreed.push_back(enemy4);
+
+	//Enemy Path 5
+	Path* enemyPath5 = new Path();
+	enemyPath5->AddPoint(glm::vec2(550.0f, 451.0f));
+	enemyPath5->AddPoint(glm::vec2(800.0f, 452.0f));
+	enemyPath5->SetCycle(true);
+	renderObjects.push_back(enemyPath5);
+	stufftobefreed.push_back(enemyPath5);
+
+	//Enemy Formation 5
+	Formation* enemyFormation5 = new Formation();
+	enemyFormation5->SetPosition(glm::vec2(551.0f, 453.0f));
+	enemyFormation5->SetPath(enemyPath5);
+	renderObjects.push_back(enemyFormation5);
+	movingObjects.push_back(enemyFormation5);
+	stufftobefreed.push_back(enemyFormation5);
+
+	//Enemie 5
+	Agent *enemy5 = new Agent("./Assets/zombie.png");
+	enemy5->setPosition(glm::vec2(552.0f, 454.0f));
+	enemy5->setFormation(enemyFormation5);
+	renderObjects.push_back(enemy5);
+	enemyObjects.push_back(enemy5);
+	separationObjects.push_back(enemy5);
+	movingObjects.push_back(enemy5);
+	stufftobefreed.push_back(enemy5);
 }
 
 int main()
