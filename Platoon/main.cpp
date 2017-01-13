@@ -70,7 +70,7 @@ void InitEnemies()
 
 	//Enemy Formation 2
 	Formation* enemyFormation2 = new Formation();
-	enemyFormation2->SetPosition(glm::vec2(501.0f, 51.0f));
+	enemyFormation2->SetPosition(glm::vec2(501.0f, 251.0f));
 	enemyFormation2->SetPath(enemyPath2);
 	renderObjects.push_back(enemyFormation2);
 	movingObjects.push_back(enemyFormation2);
