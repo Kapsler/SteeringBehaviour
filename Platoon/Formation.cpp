@@ -1,6 +1,7 @@
 #include "Formation.h"
 #include <iostream>
 #include <glm/gtx/rotate_vector.hpp>
+#include "Agent.h"
 
 Formation::Formation()
 {
@@ -21,9 +22,10 @@ Formation::~Formation()
 {
 }
 
-int Formation::registerSoldier()
+int Formation::registerSoldier(Agent* ag)
 {
 	currIndex++;
+	agents.push_back(ag);
 	return currIndex - 1;
 }
 
@@ -93,6 +95,7 @@ void Formation::Move(sf::Time delta)
  	steering = Seek(velocity, target);
 
 	velocity = velocity + steering * delta.asSeconds() * 100.0f;
+
 	velocity = truncate(velocity, maxSpeed);
 	if ((velocity.x < -0.00001f || velocity.x > 0.00001f) && (velocity.y < -0.00001f || velocity.y > 0.00001f))
 	{

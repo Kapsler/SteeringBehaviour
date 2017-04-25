@@ -6,6 +6,8 @@
 #include "SFML/Graphics.hpp"
 #include "Path.h"
 
+class Agent;
+
 class Formation : public Renderable, public Moving
 {
 public:
@@ -18,7 +20,7 @@ public:
 	Formation();
 	~Formation();
 	
-	int registerSoldier();
+	int registerSoldier(Agent* ag);
 	glm::vec2 GetPositionForIndex(int index);
 	void SetPath(Path* newpath);
 	
@@ -51,4 +53,6 @@ protected:
 	Path* pathtofollow;
 	int currentWaypoint = 0;
 	float tolerance = 5.0f;
+
+	std::vector<Agent*> agents;
 };

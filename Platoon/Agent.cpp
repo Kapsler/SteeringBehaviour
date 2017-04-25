@@ -68,7 +68,7 @@ void Agent::setPosition(glm::vec2 pos)
 void Agent::setFormation(Formation* form)
 {
 	formation = form;
-	index = form->registerSoldier();	
+	index = form->registerSoldier(this);	
 }
 
 glm::vec2 Agent::getPosition() const
